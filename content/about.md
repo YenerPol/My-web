@@ -1,6 +1,6 @@
 ---
-date: "2014-04-09"
-title: About
+date: "2021-05-20"
+title: Sobre Paúl Gomez
 ---
 
 Hugo is the **world’s fastest framework for building websites**. It is written in Go.

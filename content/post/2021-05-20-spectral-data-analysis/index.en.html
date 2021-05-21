@@ -1,0 +1,29 @@
+---
+title: Part 1 - Spectral Data Analysis
+author: Paul Gomez
+date: '2021-05-20'
+slug: spectral-data-analysis
+categories:
+  - R
+tags:
+  - Data Analysis
+  - R
+  - R Markdown
+  - ML
+  - Data Science
+---
+
+<script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
+<link href="{{< blogdown/postref >}}index.en_files/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<script src="{{< blogdown/postref >}}index.en_files/anchor-sections/anchor-sections.js"></script>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>As part of my postgraduate studies I had the opportunity of working with many experimental data, but mostly spectral data from Laser-induced breakdown spectroscopy (LIBS). LIBS is a type of atomic emission spectroscopy which uses a highly energetic laser pulse as the excitation source. The laser is focused to form a plasma, which atomizes and excites samples. The formation of the plasma only begins when the focused laser achieves a certain threshold for optical breakdown, which generally depends on the environment and the target material.</p>
+<p><img src="libs%20setup.png" width="355" style="display: block; margin: auto;" /></p>
+<p>LIBS operates by focusing the laser onto a small area at the surface of the specimen; when the laser is discharged it ablates a very small amount of material, in the range of nanograms to picograms, which generates a plasma plume with temperatures in excess of 100 000 K. At the high temperatures during the early plasma, the ablated material dissociates (breaks down) into excited ionic and atomic species. During this time, the plasma emits a continuum of radiation which does not contain any useful information about the species present, but within a very small timeframe the plasma expands at supersonic velocities and cools. At this point the characteristic atomic emission lines of the elements can be observed.</p>
+<p>Because all elements emit light of characteristic frequencies when excited to sufficiently high temperatures, LIBS can (in principle) detect all elements, limited only by the power of the laser as well as the sensitivity and wavelength range of the spectrograph &amp; detector.</p>
+<p><img src="libs%20spectra.ppm" style="display: block; margin: auto;" />
+As part of Euro-Mediterranean Symposium on Laser-Induced Breakdown Spectroscopy 2019, the EMSLIBS classification contest was released. I couldn’t participated of this contest, I was starting my master degree, but I think it’s an perfect opportunity to test my Data Analysis and Machine Learning skills in a field that is known for me - Physics and materials science.</p>
+</div>

@@ -1,14 +1,28 @@
 ---
-date: "2017-06-26T18:27:58+01:00"
+date: "2021-05-20T18:27:58+01:00"
 title: Home
 ---
 
-Welcome to **Cupper**: An accessibility-friendly Hugo theme, ported from the [original Cupper](https://github.com/ThePacielloGroup/cupper) project. Here are some of its features:
+Bienvenidos a mi web personal. Esta web intenta ser un lugar desde donde mostrar mi habilidades en el analisis de Datos y Machine Learning.
+
+terminar... terminar... terminar... terminar...
+
+terminar... terminar... terminar... terminar...
 
 {{< ticks >}}
-* Screen reader and keyboard accessible
-* Responsive
-* Numerous shortcodes
-* Toggleable dark theme
-* Toggleable table of contents per blog post
+* terminar...
+* terminar...
+* terminar...
+* terminar...
+* terminar...
 {{< /ticks >}}
+
+| Task           | Time required | Assigned to   | Current Status | Finished | 
+|----------------|---------------|---------------|----------------|-----------|
+| Calendar Cache | > 5 hours  |  | in progress | 
+| Object Cache   | > 5 hours  |  | in progress | 
+| Object Cache   | > 5 hours  |  | in progress | 
+| Object Cache   | > 5 hours  |  | in progress | 
+
+- [x] works
+- [x] works too

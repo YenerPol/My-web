@@ -4,3 +4,5 @@
 .Ruserdata
 Thumbs.db 
 public/ # if using Netlify
+/index.en_cache
+index.en_cache/

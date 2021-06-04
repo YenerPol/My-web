@@ -129,41 +129,51 @@ profan_words &lt;- tibble(profanity_alvarez) %&gt;% rename(&quot;word&quot;=&quo
         ngrams_filtered
 }</code></pre>
 <p>Applying the <em>separar_filtrar()</em> function to out data:</p>
-<pre class="r"><code>token1_task_1 &lt;- separar_filtrar(token1, profan_words)
-token2_task_1 &lt;- separar_filtrar(token2, profan_words)
-token3_task_1 &lt;- separar_filtrar(token3, profan_words)</code></pre>
+<pre class="r"><code>token1 &lt;- separar_filtrar(token1, profan_words)
+token2 &lt;- separar_filtrar(token2, profan_words)
+token3 &lt;- separar_filtrar(token3, profan_words)</code></pre>
 </div>
 </div>
 <div id="task-2---exploratory-data-analysis" class="section level2">
 <h2>Task 2 - Exploratory Data Analysis</h2>
 <p>A good first step to understand the vocabulary is to count frequency of tokens. Lets begin exploring the 1-word per token (1-gram) data:</p>
-<pre class="r"><code>token1_task_1 %&gt;% count(word1, sort = TRUE) %&gt;% summary()</code></pre>
-<pre><code>##     word1                 n            
-##  Length:110663      Min.   :     1.00  
-##  Class :character   1st Qu.:     1.00  
-##  Mode  :character   Median :     2.00  
-##                     Mean   :    39.53  
-##                     3rd Qu.:     5.00  
-##                     Max.   :225943.00</code></pre>
-<p>Here we can see that we have a really huge vocabulary, there are more than a hundred thousand words! But, in the other hand, the summary of this vocabulary shows that 75% of the words are repeated just 5 times or less. Cut the data by frecuency could help making our model faster and lighther. The most frequent words are:</p>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/frequency%20plot%201%20gram-1.png" width="672" style="display: block; margin: auto;" />
-Now I will select just words with a frequency &gt;3, we want to reduce the vocabulary size:</p>
-<pre class="r"><code># selecting words with count &gt;3
-token1 &lt;- token1_task_1 %&gt;% 
-  count(word1, sort = T) %&gt;% 
-  filter(n &gt; 3) %&gt;% 
-  select(word1)
+<pre class="r"><code>token1 &lt;- token1 %&gt;% count(word1, sort = TRUE)
+occurrences &lt;- sum(token1$n)
+token1 &lt;- token1 %&gt;% mutate(freq = n/occurrences)
 
-head(token1)</code></pre>
-<pre><code>## # A tibble: 6 x 1
-##   word1
-##   &lt;chr&gt;
-## 1 the  
-## 2 to   
-## 3 and  
-## 4 of   
-## 5 in   
-## 6 for</code></pre>
+token1 %&gt;% summary()</code></pre>
+<pre><code>##     word1                 n                  freq          
+##  Length:110663      Min.   :     1.00   Min.   :2.300e-07  
+##  Class :character   1st Qu.:     1.00   1st Qu.:2.300e-07  
+##  Mode  :character   Median :     2.00   Median :4.600e-07  
+##                     Mean   :    39.53   Mean   :9.040e-06  
+##                     3rd Qu.:     5.00   3rd Qu.:1.140e-06  
+##                     Max.   :225943.00   Max.   :5.164e-02</code></pre>
+<p>Here we can see that we have a really huge vocabulary, there are more than a hundred thousand words! But, in the other hand, the summary of this vocabulary shows that 75% of the words are repeated just 5 times or less. Cut the data by frecuency could help making our model faster and lighther. The most frequent words are:</p>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/frequency%20plot%201%20gram-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now I will select just words with a frequency &gt;3, we want to reduce the vocabulary size:</p>
+<pre class="r"><code># selecting words with count &gt;3
+token1 &lt;- token1 %&gt;% filter(n &gt; 3) 
+occurrences &lt;- sum(token1$n)
+token1 &lt;- token1 %&gt;% mutate(freq = n/occurrences)
+
+token1 %&gt;% summary()</code></pre>
+<pre><code>##     word1                 n                 freq          
+##  Length:34313       Min.   :     4.0   Min.   :9.400e-07  
+##  Class :character   1st Qu.:     6.0   1st Qu.:1.410e-06  
+##  Mode  :character   Median :    12.0   Median :2.810e-06  
+##                     Mean   :   124.5   Mean   :2.914e-05  
+##                     3rd Qu.:    35.0   3rd Qu.:8.200e-06  
+##                     Max.   :225943.0   Max.   :5.291e-02</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##   word1      n   freq
+##   &lt;chr&gt;  &lt;int&gt;  &lt;dbl&gt;
+## 1 the   225943 0.0529
+## 2 to    132499 0.0310
+## 3 and   117102 0.0274
+## 4 of     95949 0.0225
+## 5 in     78864 0.0185
+## 6 for    51885 0.0122</code></pre>
 <p>Now we have a vocabulary of 50512 words. The next step is to filter the 2-gram and 3-grams tokens to keep just words which belongs to the vocabulary:</p>
 <pre class="r"><code># this function gets 2-gram and 3-gram data (1 word per column) and 
 # remove words that doesn&#39;t appear in the vocabulary 
@@ -176,9 +186,9 @@ clean_func &lt;- function(dat, vocabulary){
 }
 
 # Filtering token2 y token3
-token2 &lt;- clean_func(token2_task_1, token1)
-token3 &lt;- clean_func(token3_task_1, token1)
-rm(token1_task_1, token2_task_1, token3_task_1, blogs, news, twitter)
+token2 &lt;- clean_func(token2, token1)
+token3 &lt;- clean_func(token3, token1)
+rm(blogs, news, twitter)
 
 head(token3)</code></pre>
 <pre><code>## # A tibble: 6 x 3
@@ -195,10 +205,25 @@ head(token3)</code></pre>
     unite(bigram, word1, word2, sep = &quot; &quot;) %&gt;% 
     count(bigram, sort = T)
 
-token3 &lt;- token3 %&gt;% 
-    unite(trigram, word1, word2, word3, sep = &quot; &quot;) %&gt;% 
-    count(trigram, sort = T)</code></pre>
-<p>Now we can see which are the most common bigrams and trigrams in our data:
-<img src="{{< blogdown/postref >}}index.en_files/figure-html/frequency%20plot%202%20gram-1.png" width="672" style="display: block; margin: auto;" /></p>
+token2 %&gt;% .[1:20,] %&gt;% 
+    mutate(name = fct_reorder(bigram, n)) %&gt;%
+    ggplot(aes(x=name, y=n)) +
+    geom_bar(stat=&quot;identity&quot;, fill=&quot;black&quot;, alpha=.6, width=.4) +
+    coord_flip() + 
+    xlab(&quot;&quot;) + ylab(&quot;Counts&quot;) + ggtitle(&quot;20 Most Frequent Bigrams&quot;) +
+    theme_gray()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/token2%20and%20token3%20counts-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now we can see which are the most common trigrams in our data:</p>
 <p><img src="{{< blogdown/postref >}}index.en_files/figure-html/frequency%20plot%203%20gram-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>An interesting question is - How many unique words do we need in a frequency sorted dictionary to cover 50% of all word instances in the language? 90%? Lets see:</p>
+<pre class="r"><code>token1 %&gt;% 
+    ggplot(aes(x=1:nrow(token1), y=cumsum(freq))) + 
+    geom_jitter() + xlab(&quot;Word rank&quot;) + 
+    ylab(&quot;Freq Cumulative sum&quot;) +
+    geom_hline(yintercept=0.95, color = &quot;blue&quot;) +
+    geom_hline(yintercept=0.75, color = &quot;pink&quot;) +
+    geom_hline(yintercept=0.50, color = &quot;red&quot;) +
+    theme_gray()</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>In the graph above we can see we need 132 to explain 50% of occurrences, 1263 to explain 75% of occurrences and 5529 to explain 95% of occurrences in our data..</p>
 </div>

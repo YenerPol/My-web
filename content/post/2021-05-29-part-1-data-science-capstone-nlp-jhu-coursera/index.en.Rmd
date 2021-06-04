@@ -146,44 +146,52 @@ separar_filtrar <- function(data, profan){
 Applying the *separar_filtrar()* function to out data:
 
 ```{r applying separar_filtrar, cache = FALSE}
-token1_task_1 <- separar_filtrar(token1, profan_words)
-token2_task_1 <- separar_filtrar(token2, profan_words)
-token3_task_1 <- separar_filtrar(token3, profan_words)
+token1 <- separar_filtrar(token1, profan_words)
+token2 <- separar_filtrar(token2, profan_words)
+token3 <- separar_filtrar(token3, profan_words)
 ```
        
-```{r removing var2, eval = FALSE, echo = FALSE}
-rm(token1,token2,token3)
-```
 ## Task 2 - Exploratory Data Analysis
 
 A good first step to understand the vocabulary is to count frequency of tokens. Lets begin exploring the 1-word per token (1-gram) data:
 
 ```{r count 1-gram}
-token1_task_1 %>% count(word1, sort = TRUE) %>% summary()
+token1 <- token1 %>% count(word1, sort = TRUE)
+occurrences <- sum(token1$n)
+token1 <- token1 %>% mutate(freq = n/occurrences)
+
+token1 %>% summary()
 ```
+
 Here we can see that we have a really huge vocabulary, there are more than a hundred thousand words! But, in the other hand, the summary of this vocabulary shows that 75% of the words are repeated just 5 times or less. Cut the data by frecuency could help making our model faster and lighther. The most frequent words are:
 
 ```{r frequency plot 1 gram, echo=FALSE}
 # plot with the 20 most frequent words in vocabulary
-token1_task_1 %>% count(word1, sort = T) %>% .[1:20,] %>% 
+token1 %>% .[1:20,] %>% 
     mutate(name = fct_reorder(word1, n)) %>%
     ggplot( aes(x=name, y=n)) +
-    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
-    coord_flip() +
+    geom_bar(stat="identity", fill="black", alpha=.6, width=.4) +
+    coord_flip() + ylab("Counts") +
     xlab("") + ggtitle("20 Most Frequent Words") +
-    theme_bw()
+    theme_gray()
 ```
+
 Now I will select just words with a frequency >3, we want to reduce the vocabulary size:  
+
 ```{r cutting down vocabulary}
 # selecting words with count >3
-token1 <- token1_task_1 %>% 
-  count(word1, sort = T) %>% 
-  filter(n > 3) %>% 
-  select(word1)
+token1 <- token1 %>% filter(n > 3) 
+occurrences <- sum(token1$n)
+token1 <- token1 %>% mutate(freq = n/occurrences)
 
+token1 %>% summary()
+```
+```{r, echo=FALSE}
 head(token1)
 ```
+
 Now we have a vocabulary of `r nrow(news)` words. The next step is to filter the 2-gram and 3-grams tokens to keep just words which belongs to the vocabulary:
+
 ```{r cutting down 2 and 3 grams}
 # this function gets 2-gram and 3-gram data (1 word per column) and 
 # remove words that doesn't appear in the vocabulary 
@@ -196,41 +204,61 @@ clean_func <- function(dat, vocabulary){
 }
 
 # Filtering token2 y token3
-token2 <- clean_func(token2_task_1, token1)
-token3 <- clean_func(token3_task_1, token1)
-rm(token1_task_1, token2_task_1, token3_task_1, blogs, news, twitter)
+token2 <- clean_func(token2, token1)
+token3 <- clean_func(token3, token1)
+rm(blogs, news, twitter)
 
 head(token3)
 ```
 To count Bigrams and Trigrams, it's necesesary to combine each row in a single character column:  
+
 ```{r token2 and token3 counts}
 token2 <- token2 %>% 
     unite(bigram, word1, word2, sep = " ") %>% 
     count(bigram, sort = T)
 
-token3 <- token3 %>% 
-    unite(trigram, word1, word2, word3, sep = " ") %>% 
-    count(trigram, sort = T)
-```
-Now we can see which are the most common bigrams and trigrams in our data:
-```{r frequency plot 2 gram, echo=FALSE}
 token2 %>% .[1:20,] %>% 
     mutate(name = fct_reorder(bigram, n)) %>%
     ggplot(aes(x=name, y=n)) +
-    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    geom_bar(stat="identity", fill="black", alpha=.6, width=.4) +
     coord_flip() + 
     xlab("") + ylab("Counts") + ggtitle("20 Most Frequent Bigrams") +
-    theme_minimal()
+    theme_gray()
 ```
 
+Now we can see which are the most common trigrams in our data:
+
 ```{r frequency plot 3 gram, echo=FALSE}
+token3 <- token3 %>% 
+    unite(trigram, word1, word2, word3, sep = " ") %>% 
+    count(trigram, sort = T)
+
 token3 %>% .[1:20,] %>% 
     mutate(name = fct_reorder(trigram, n)) %>%
     ggplot(aes(x=name, y=n)) +
-    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    geom_bar(stat="identity", fill="black", alpha=.6, width=.4) +
     coord_flip() + 
     xlab("") + ylab("Counts") + ggtitle("20 Most Frequent Trigrams") +
-    theme_bw()
+    theme_gray()
 ```
 
+An interesting question is - How many unique words do we need in a frequency sorted dictionary to cover 50% of all word instances in the language? 90%? Lets see:
 
+```{r}
+token1 %>% 
+    ggplot(aes(x=1:nrow(token1), y=cumsum(freq))) + 
+    geom_jitter() + xlab("Word rank") + 
+    ylab("Freq Cumulative sum") +
+    geom_hline(yintercept=0.95, color = "blue") +
+    geom_hline(yintercept=0.75, color = "pink") +
+    geom_hline(yintercept=0.50, color = "red") +
+    theme_gray()
+```
+```{r, include=FALSE}
+cum_sum <- cumsum(token1$freq) 
+cum_050 <- sum(cum_sum <= 0.50)
+cum_075 <- sum(cum_sum <= 0.75)
+cum_095 <- sum(cum_sum <= 0.95)
+```
+
+In the graph above we can see we need `r cum_050` to explain 50% of occurrences, `r cum_075` to explain 75% of occurrences and `r cum_095` to explain 95% of occurrences in our data..
